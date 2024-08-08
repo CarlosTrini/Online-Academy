@@ -1,0 +1,631 @@
+import React, { useEffect, useState } from "react";
+import { cardT, cartT, userT } from "../../../typesInterfaces/types";
+import { isEmpty, isNil } from "lodash";
+
+import bcrypt from "bcryptjs";
+
+import noCard from "../../../assets/credit-card.png";
+
+import "../userProfile.scss";
+import { DatePicker, Input, Modal, Spin, Tooltip } from "antd";
+import { simpleAlertTimer } from "../../../helpers/alerts";
+import { getStorageArr, saveStorage } from "../../../helpers/storagesFunc";
+// import dayjs from "dayjs";
+import { namesStorage } from "../../../initData/namesStorage";
+import CreditCardModal from "../../../components/creditCard.tsx/CreditCardModal";
+
+type propsT = {
+  userInfo: userT;
+  getCardsInfo?: (cardSelected: cardT) => void | null;
+};
+
+type cardsP = cardT & {
+  id: string;
+  visible: boolean;
+};
+
+// const inputsInit = {
+//   name: "",
+//   cvv: "",
+//   date: dayjs().format("MM/YY"),
+//   number: "",
+// };
+
+const CreditCard: React.FC<propsT> = (props) => {
+    const { userInfo } = props;
+  const [loader, setLoader] = useState(true);
+  const [cards, setCards] = useState<cardsP[]>([]);
+  const [userPass, setUserPass] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  //   const [loaderModal, setLoaderModal] = useState(false);
+  //   const [inputs, setInputs] = useState(inputsInit);
+
+  const makeCards = (cards: cardT[]) => {
+    if (isEmpty(cards) === true || isNil(cards) === true) {
+      setCards([]);
+      setLoader(false);
+      return;
+    }
+
+    const addIdCards = cards.map((c, id) => {
+      c.visible = false;
+      c.id = id;
+
+      return c;
+    }) as cardsP[];
+
+    setTimeout(() => {
+      setCards(addIdCards);
+      setLoader(false);
+    }, 1500);
+  };
+
+  const checkPass = (pass: string, userPass: string) => {
+    const checkP = bcrypt.compareSync(pass, userPass);
+    return checkP;
+  };
+
+  const showInfoCard = (idCard: string) => {
+    const nameOwner = document.getElementById(
+      `nameOwner-${idCard}`
+    ) as HTMLInputElement;
+    const date = document.getElementById(`date-${idCard}`) as HTMLInputElement;
+    const cvv = document.getElementById(`cvv-${idCard}`) as HTMLInputElement;
+    const cardNumber = document.getElementById(
+      `cardNumber-${idCard}`
+    ) as HTMLInputElement;
+
+    const types: { [key: string]: string } = {
+      password: "text",
+      text: "password",
+    };
+
+    const updateVisibleCards = cards.map((c) => {
+      if (c.id === idCard) {
+        c.visible = !c.visible;
+      }
+
+      return c;
+    });
+
+    setCards(updateVisibleCards);
+
+    nameOwner.type = types[nameOwner.type];
+    date.type = types[date.type];
+    cvv.type = types[cvv.type];
+    cardNumber.type = types[cardNumber.type];
+  };
+
+  const deleteCard = (idCard: string) => {
+    setLoader(true);
+    const updateCards = cards.filter((c) => c.id !== idCard);
+
+    //TODO: FALTA ACTUALIZAR EL STORAGE
+    const users: userT[] = getStorageArr({ name: namesStorage.usersStorage });
+
+    if (isNil(users) === true || isEmpty(users) === true) {
+      setLoaderModal(false);
+      return simpleAlertTimer({
+        title: "Ha ocurrido un error intenta de nuevo o más tarde",
+        icon: "error",
+      });
+    }
+
+    let currentUser: userT = {};
+    const updateUsers = users.map((u) => {
+      if (userInfo.id === u.id) {
+        u.card = updateCards;
+        currentUser = u;
+      }
+      return u;
+    });
+
+    saveStorage({
+      name: namesStorage.usersStorage,
+      value: JSON.stringify(updateUsers),
+    });
+
+    setTimeout(() => {
+      setLoader(false);
+      makeCards(currentUser.card || []);
+    }, 1500);
+  };
+
+  //   const handleInputs = ({ id, value }: { id: string; value: string }) => {
+  //     setInputs({
+  //       ...inputs,
+  //       [id]: value,
+  //     });
+  //   };
+
+  //   const closeModal = () => {
+  //     setShowModal(false);
+  //     // setInputs(inputsInit);
+  //   };
+
+  //   const saveCard = () => {
+  //     setLoaderModal(true);
+
+  //     if ([...Object.values(inputs)].every((e) => e !== "") === false) {
+  //       setLoaderModal(false);
+  //       return simpleAlertTimer({
+  //         title: "Todos los campos son obligatorios",
+  //         icon: "info",
+  //       });
+  //     }
+
+  //     // guardar la tarjeta en el usuario
+
+  //     const users: userT[] = getStorageArr({ name: namesStorage.usersStorage });
+
+  //     if (isNil(users) === true || isEmpty(users) === true) {
+  //       setLoaderModal(false);
+  //       return simpleAlertTimer({
+  //         title: "Ha ocurrido un error intenta de nuevo o más tarde",
+  //         icon: "error",
+  //       });
+  //     }
+
+  //     let currentUserInfo: userT = {};
+
+  //     const updateUsers = users.map((u) => {
+  //       if (userInfo.id === u.id) {
+  //         u.card?.push({
+  //           nameOwner: inputs.name,
+  //           cvv: inputs.cvv,
+  //           cardNumber: inputs.number,
+  //           date: inputs.date,
+  //         });
+  //         currentUserInfo = u;
+  //       }
+  //       return u;
+  //     });
+
+  //     saveStorage({
+  //       name: namesStorage.usersStorage,
+  //       value: JSON.stringify(updateUsers),
+  //     });
+
+  //     makeCards(currentUserInfo.card || []);
+
+  //     setTimeout(() => {
+  //       setLoaderModal(false);
+  //       closeModal();
+  //       simpleAlertTimer({
+  //         title: "Tarjeta agregada con éxito",
+  //         icon: "success",
+  //       });
+  //     }, 1500);
+  //   };
+
+  useEffect(() => {
+    makeCards(userInfo.card || []);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo]);
+
+  return (
+    <>
+      <Spin spinning={loader} size="large">
+        <section className="">
+          {(isEmpty(cards) === true || isNil(cards) === true) && (
+            <>
+              <div className="img-credit-card mx-auto mt-4">
+                <img src={noCard} alt="" />
+              </div>
+              <div className="text-center">
+                <p className="mb-0 fs-20 text-primary ">
+                  No se han agregado tarjetas de pago
+                </p>
+                <div className="mt-3">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      setShowModal(true);
+                    }}
+                  >
+                    {" "}
+                    <i className="fas fa-plus"></i> Agregar
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {isEmpty(cards) === false && isNil(cards) === false && (
+            <>
+              {cards.map((c) => {
+                return (
+                  <>
+                    <div className=" card-card-credit">
+                      <div className="d-flex align-items-center justify-content-center mb-3">
+                        <p className="mb-0 me-2">Propietario: </p>
+                        <Input
+                          type="password"
+                          id={`nameOwner-${c.id}`}
+                          value={c.nameOwner}
+                          disabled
+                        />
+                      </div>
+
+                      <div className="d-flex align-items-center justify-content-center mb-3">
+                        <p className="mb-0 me-2">Tarjeta: </p>
+                        <Input
+                          type="password"
+                          id={`cardNumber-${c.id}`}
+                          value={c.cardNumber}
+                          disabled
+                        />
+                      </div>
+
+                      <div className="d-flex align-items-center justify-content-center">
+                        <div className="d-flex align-items-center me-3">
+                          <p className="mb-0 me-2">Fecha: </p>
+                          <Input
+                            type="password"
+                            value={c.date}
+                            disabled
+                            id={`date-${c.id}`}
+                          />
+                        </div>
+
+                        <div className="d-flex align-items-center">
+                          <p className="mb-0 me-2">CVV: </p>
+                          <Input
+                            type="password"
+                            value={c.cvv}
+                            disabled
+                            id={`cvv-${c.id}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="text-end mt-2">
+
+                        {/* PARA CUANDO SE HAGA EL PAGO DE LO QUE HAY EN EL CARRITO */}
+                        {(isNil(props?.getCardsInfo) === false ||
+                          isEmpty(props?.getCardsInfo) === false) && (
+                            <>
+                             <Tooltip
+                            trigger={"click"}
+                            destroyTooltipOnHide={true}
+                            onOpenChange={(open) => {
+                              // abra o cierre se resetea ese input..
+                              setUserPass("");
+                            }}
+                            title={
+                              <>
+                                <div>
+                                  <p className="mb-2">
+                                    Para seleccionar esta tarjeta, ingresa tu
+                                    contraseña
+                                  </p>
+                                  <Input
+                                    type="password"
+                                    value={userPass}
+                                    onChange={(e) => {
+                                      setUserPass(e.target.value); // solo para guardar una ref...
+                                    }}
+                                  />
+                                  <div className="mt-3 text-end">
+                                    <button
+                                      className="btn btn-outline-warning btn-sm"
+                                      onClick={() => {
+                                        const isCorrectPass = checkPass(
+                                          userPass,
+                                          userInfo.password
+                                        );
+
+                                        setUserPass("");
+                                        if (isCorrectPass === false) {
+                                          return simpleAlertTimer({
+                                            title: "Contraseña incorrecta",
+                                            icon: "error",
+                                          });
+                                        }
+
+                                        // showInfoCard(c.id);
+                                        if(isNil(props?.getCardsInfo) === false){
+                                            props.getCardsInfo(c);
+                                        }
+                                      }}
+                                    >
+                                      {" "}
+                                      <i className="fas fa-circle-check me-1"></i>{" "}
+                                      Continuar
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            }
+                            className="me-2"
+                          >
+                            <button
+                              className="btn btn-outline-success"
+                              onClick={() => {}}
+                            >
+                              <i className="fas fa-credit-card"> </i>
+                            </button>
+                          </Tooltip>
+                            </>
+                          )}
+
+                        {/* BOTÓN PARA MOSTAR INFORMACIÓN DE LA TARJETA */}
+                        {c.visible === false && (
+                          <Tooltip
+                            trigger={"click"}
+                            destroyTooltipOnHide={true}
+                            onOpenChange={(open) => {
+                              // abra o cierre se resetea ese input..
+                              setUserPass("");
+                            }}
+                            title={
+                              <>
+                                <div>
+                                  <p className="mb-2">
+                                    Para mostrar información, ingresa tu
+                                    contraseña
+                                  </p>
+                                  <Input
+                                    type="password"
+                                    value={userPass}
+                                    onChange={(e) => {
+                                      setUserPass(e.target.value); // solo para guardar una ref...
+                                    }}
+                                  />
+                                  <div className="mt-3 text-end">
+                                    <button
+                                      className="btn btn-outline-warning btn-sm"
+                                      onClick={() => {
+                                        const isCorrectPass = checkPass(
+                                          userPass,
+                                          userInfo.password
+                                        );
+
+                                        setUserPass("");
+                                        if (isCorrectPass === false) {
+                                          return simpleAlertTimer({
+                                            title: "Contraseña incorrecta",
+                                            icon: "error",
+                                          });
+                                        }
+
+                                        showInfoCard(c.id);
+                                      }}
+                                    >
+                                      {" "}
+                                      <i className="fas fa-circle-check me-1"></i>{" "}
+                                      Continuar
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            }
+                            className="me-2"
+                          >
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => {}}
+                            >
+                              <i className="fas fa-eye"> </i>
+                            </button>
+                          </Tooltip>
+                        )}
+
+                        {/* BOTÓN PARA OCULAR LA INFORMACION DE UNA TARJETA */}
+
+                        {c.visible === true && (
+                          <Tooltip
+                            title={"Ocultar información"}
+                            className="me-2"
+                          >
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => {
+                                showInfoCard(c.id);
+                              }}
+                            >
+                              <i className="fas fa-eye"> </i>
+                            </button>
+                          </Tooltip>
+                        )}
+
+                        {/*  BOTÓN PARA ELIMINAR UNA TARJETA */}
+                        {(isNil(props?.getCardsInfo) === true) && (
+                                <Tooltip
+                                trigger={"click"}
+                                destroyTooltipOnHide={true}
+                                onOpenChange={(open) => {
+                                    // abra o cierre se resetea ese input..
+                                    setUserPass("");
+                                }}
+                                title={
+                                    <>
+                                    <div>
+                                        <p className="mb-2">
+                                        Para eliminar esta tarjeta, ingresa tu
+                                        contraseña
+                                        </p>
+                                        <Input
+                                        type="password"
+                                        value={userPass}
+                                        onChange={(e) => {
+                                            setUserPass(e.target.value); // solo para guardar una ref...
+                                        }}
+                                        />
+                                        <div className="mt-3 text-end">
+                                        <button
+                                            className="btn btn-outline-warning btn-sm"
+                                            onClick={() => {
+                                            const isCorrectPass = checkPass(
+                                                userPass,
+                                                userInfo.password
+                                            );
+
+                                            setUserPass("");
+                                            if (isCorrectPass === false) {
+                                                return simpleAlertTimer({
+                                                title: "Contraseña incorrecta",
+                                                icon: "error",
+                                                });
+                                            }
+
+                                            deleteCard(c.id);
+                                            }}
+                                        >
+                                            {" "}
+                                            <i className="fas fa-circle-check me-1"></i>{" "}
+                                            Continuar
+                                        </button>
+                                        </div>
+                                    </div>
+                                    </>
+                                }
+                                className="me-2"
+                                >
+                                <button className="btn btn-dark" onClick={() => {}}>
+                                    <i className="fas fa-trash"> </i>
+                                </button>
+                                </Tooltip>
+
+                          ) }
+                      </div>
+                    </div>
+                  </>
+                );
+              })}
+              <div className="mt-3 text-end">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => {
+                    setShowModal(true);
+                  }}
+                >
+                  {" "}
+                  <i className="fas fa-plus"></i> Agregar
+                </button>
+              </div>
+            </>
+          )}
+        </section>
+      </Spin>
+
+      <CreditCardModal
+        showModal={showModal}
+        setShowModal={(actionToShow) => {
+          setShowModal(actionToShow);
+        }}
+        callBackClose={({ updateUserInfo }) => {
+          makeCards(updateUserInfo?.card || []);
+        }}
+        userInfo={userInfo}
+      />
+
+      {/* <Modal
+        destroyOnClose={true}
+        closable={true}
+        open={showModal}
+        footer={null}
+        onCancel={() => closeModal()}
+        centered={true}
+      >
+        <Spin spinning={loaderModal} size="large">
+          <header>
+            <small>(la información debe ser falsa, solo respetar la estructura)</small>
+            <p className="mb-3 fs-18 fw-bold text-dark">
+              {" "}
+              <i className="fas fa-credit-card"></i> Agregar tarjeta
+            </p>
+          </header>
+
+          <section>
+            <div className="mb-2">
+              <p className="mb-2">Nombre del propietario</p>
+              <Input
+                value={inputs.name}
+                id="name"
+                placeholder=""
+                onChange={(e: React.ChangeEvent) => {
+                  handleInputs({
+                    id: e.target.id,
+                    value: e.target.value,
+                  });
+                }}
+              />
+            </div>
+            <div className="mb-2">
+              <p className="mb-2">Número de tarjeta</p>
+              <Input
+                maxLength={18}
+                value={inputs.number}
+                id="number"
+                placeholder=""
+                onChange={(e: React.ChangeEvent) => {
+                  handleInputs({
+                    id: e.target.id,
+                    value: e.target.value,
+                  });
+                }}
+              />
+            </div>
+
+            <div className="mb-2">
+              <p className="mb-0">Fecha de vencimiento</p>
+              <DatePicker
+                format="MM/YY"
+                // value={dayjs(inputs.date, 'MM/YY')}
+                defaultValue={dayjs(inputs.date, "MM/YY")}
+                placeholder="Seleccionar"
+                id="date"
+                onChange={(date, dateString) => {
+                  handleInputs({
+                    id: "date",
+                    value: dateString,
+                  });
+                }}
+              />
+            </div>
+
+            <div className="mb-2">
+              <p className="mb-0  "> CVV </p>
+              <Input
+                style={{ width: "30%" }}
+                maxLength={3}
+                value={inputs.cvv}
+                id="cvv"
+                placeholder=""
+                onChange={(e: React.ChangeEvent) => {
+                  handleInputs({
+                    id: e.target.id,
+                    value: e.target.value,
+                  });
+                }}
+              />
+            </div>
+
+            <div className="text-end mt-3">
+              <button
+                className="btn btn-danger me-2"
+                onClick={() => closeModal()}
+              >
+                {" "}
+                <i className="fas fa-times me-1"></i> Cerrar
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  saveCard();
+                }}
+              >
+                {" "}
+                <i className="fas fa-floppy-disk me-1"></i> Guardar
+              </button>
+            </div>
+          </section>
+        </Spin>
+      </Modal> */}
+    </>
+  );
+};
+
+export default CreditCard;

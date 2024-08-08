@@ -1,0 +1,68 @@
+.card-container {
+    width: 250px;
+    min-height: 350px;
+    max-height: 250px;
+    background-color: #303035;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 3px 2px 8px 2px #303035;
+}
+
+
+.card-image{
+    border-radius: 3px;
+    // overflow: hidden;
+    height: 140px;
+    
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.card-content{
+    // background-color: #f2f2f2;
+    color: #ffffff;
+    backdrop-filter: blur(10px)
+}
+
+.card-discount{
+    color: #ffffff30;
+    text-decoration: line-through;
+}
+
+.card-students, .card-teacher{
+    color: #ffffff30;
+}
+
+
+
+.react-multi-carousel-track{ // ESTA CLASE PERTENECE A REACT-MULTI-CAROUSEL... LA LIBRERIA
+    padding: 15px;
+    background-color: transparent;
+}
+
+
+// =================
+// TOOLTIP
+.tool-container{
+    width: 350px;
+    max-width: 400px;
+    background: #303035;
+    border: 2px solid #1818b1;
+    border-radius: 3px;
+}
+
+.tool-short-desc{
+    border-top: 1px solid #1818b1;
+    border-bottom: 1px solid #1818b1;
+}
+
+
+.ant-tooltip-hidden-own{ //sobre escribe la clase de abajo...
+    
+        .ant-tooltip-hidden{
+            display: none;
+        }
+    
+}

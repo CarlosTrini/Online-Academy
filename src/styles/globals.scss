@@ -1,0 +1,115 @@
+
+
+a {
+    color: inherit;
+    border: none;
+    text-decoration: none;
+
+    &:hover{
+        color: inherit;
+    }
+}
+
+.w-sections{
+    width: 60%;
+    margin: 10px auto;
+}
+
+.w-sections-90{
+    width: 90%;
+    margin: 10px auto;
+}
+
+.text-50{
+    color: #30303550;
+}
+
+.text-white-op{
+    color: #575762;
+}
+
+.t-font-white{
+    color: #ffffff50;
+}
+
+.fs-36 {
+    font-size: 36px;
+}
+.fs-34 {
+    font-size: 34px;
+}
+.fs-32 {
+    font-size: 32px;
+}
+.fs-30 {
+    font-size: 30px;
+}
+.fs-28 {
+    font-size: 28px;
+}
+
+.fs-26 {
+    font-size: 26px;
+}
+.fs-24{
+    font-size: 24px;
+}
+
+.fs-22{
+    font-size: 22px;
+}
+
+.fs-20{
+    font-size: 20px;
+}
+
+.fs-18{
+    font-size: 18px;
+}
+
+.fs-16{
+    font-size: 16px;
+}
+
+.fs-15{
+    font-size: 15px;
+}
+
+.fs-14{
+    font-size: 14px;
+}
+
+.fs-12{
+    font-size: 12px;
+}
+
+.fs-10{
+    font-size: 10px;
+}
+
+// carousel de react-multi-carousel
+.w-auto{ //esto es par que las cards del carousel no esten tan separadas como por defectos... en espcial el width
+    width: auto;
+    margin-right: 25px;
+}
+
+
+  /* Seleccionamos la barra del scroll */
+  ::-webkit-scrollbar {
+    margin-left: 10px;
+    width: 12px; /* Anchura de la barra */
+    background-color: #30303550; /* Fondo color */
+    border-radius: 10px; /* Curva del borde */
+  }
+  
+  /* Seleccionamos el elemento de la barra */
+  ::-webkit-scrollbar-thumb {
+    background-color: #3838df50; /* Color de la barra */
+    border-radius: 10px; /* Curva del borde */
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Sombra */
+  }
+  
+  /* Seleccionamos el estado hover de la barra */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #01019b80; /* Cambiamos el color en hover */
+  }

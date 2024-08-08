@@ -1,0 +1,18 @@
+
+.img-login-right{
+    width: 150px;
+    height: 150px;
+    background: url('../../assets/logo.jpg') center/cover no-repeat;
+    border-radius: 60%;
+}
+
+
+.login-inputs{
+    height: 100vh!important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}

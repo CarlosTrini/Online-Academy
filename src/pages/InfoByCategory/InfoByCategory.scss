@@ -1,0 +1,32 @@
+.category-main{
+    display: flex;
+}
+
+.category-filters{
+    // width: 20%;
+    
+}
+
+.category-courses{
+    width:80%;
+    margin: 20px;
+    padding:15px;
+    border-left: 1px solid #303035;
+}
+.courses-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 30px;
+    min-height: 200px;
+    max-height: 1000px;
+    overflow-x: auto;
+    
+}
+
+.category-main {
+
+    .ant-card .ant-card-body{
+        padding: 15px;
+    }
+}

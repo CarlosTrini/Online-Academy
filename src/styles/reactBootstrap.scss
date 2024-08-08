@@ -1,0 +1,14 @@
+.row {
+    margin-top: initial;
+    margin-right: initial;
+    margin-left: initial;
+}
+
+.row > * {
+  padding-right: initial;
+  padding-left: initial;
+}
+
+.btn-outline-dark:hover{
+  background-color: #303035;
+}

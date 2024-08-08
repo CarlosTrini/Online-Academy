@@ -1,0 +1,29 @@
+
+
+
+
+
+//  -------------------------------------------------------------------------------
+//   ESTILOS DEL BG
+.bg-main {
+    
+    padding-top: 80px; // los primeros 70px son porque el header mide 70px de alto, y esta en position: fixed;
+    position: relative; // para que el footer no haga cosas raras
+    padding-bottom: 120px; //los primero 150px es lo que mide el footer de alto
+    min-height: 100vh;
+	// background: rgb(232,232,232);
+    // background: linear-gradient(360deg, rgba(232,232,232,1) 0%, rgba(180,160,255,1) 100%);
+}
+
+
+.footer{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #303035;
+}

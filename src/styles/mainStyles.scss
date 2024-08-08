@@ -1,0 +1,10 @@
+body{
+    font-family: "PT Serif", serif!important;
+    font-weight: 400;
+    font-style: normal;
+    // color: #303035;
+}
+
+@import './reactBootstrap.scss';
+@import './globals.scss';
+@import './spinner.scss';
