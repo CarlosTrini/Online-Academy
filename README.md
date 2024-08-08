@@ -30,7 +30,7 @@ Se puede:
     - Aún NO es óptima para resoluciones pequeñas
 
 
-LINK ==> https://developersbar.netlify.app/
+LINK ==> https://online-academy-trinidad.netlify.app/
 
 ![login](src/assets/previewsSite/login.png)
 ![register](src/assets/previewsSite/register.png)
